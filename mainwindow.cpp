@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <QMovie>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -7,47 +9,47 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 }
-void MainWindow::paintEvent(QPaintEvent *){
-    QPainter painter;
-    painter.begin(this);
-    QPen pen;
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::SolidLine);
-    pen.setWidth(5);
-    QBrush brush;
-    QColor color;
-    color.setRgb(Qt::red,Qt::green,Qt::blue);
-    brush.setColor(color);
-    brush.setStyle(Qt::SolidPattern);
-    painter.setPen(pen);
-    painter.setBrush(brush);
-    painter.drawRect(250,500,100,100);
-    painter.end();
-}
-
-
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_startButton_clicked()
 {
-    h.show();
+    QMessageBox::StandardButton message = QMessageBox::question(this, "Chose play mode?!", "You want to play default 4x4 mode?", QMessageBox::Yes | QMessageBox::No);
+    if(message == QMessageBox::Yes){
+        board = new boardWithgame(this);
+        board->show();
+    } else {
+        message = QMessageBox::question(this, "Chose play mode?!", "Ok, maybe 5x5??", QMessageBox::Yes | QMessageBox::No);
+        if(message == QMessageBox::Yes){
+            board5 = new board5x5;
+            board5->show();
+        } else {
+            //message = QMessageBox::about(this, "Ok", "Sorry, w8t for updates or chose supported play mode!");
+        }
+    }
 
 }
 
-void MainWindow::on_checkBox_stateChanged(int arg1)
+void MainWindow::on_scoreButton_clicked()
 {
-    //ui->openGLWidget->paintEvent(*this);
+    fin.open(name.toStdString());
+    while(std::getline(fin,line)){
+        if(std::stoi(line) > maxScore){
+            maxScore = std::stoi(line);
+        }
+    }
+    line = std::to_string(maxScore);
+    QMessageBox *mes = new QMessageBox;
+    mes->setText(QString::fromStdString(line));
+    mes->exec();
+    fin.close();
 }
 
-MainWindow::setOpen(){
-
-}
-
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_exitButton_clicked()
 {
-    exit(0);
+    close();
 }
+
